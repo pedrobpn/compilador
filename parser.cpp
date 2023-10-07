@@ -271,17 +271,28 @@ ASTNode* LP() {
     return node;
 }
 
+// Função auxiliar hipotética
+bool isStatementStartToken(t_token token) {
+    // Esta função verifica se o token atual é o início de uma sentença/comando. 
+    // Por simplicidade, vou supor que a sentença pode começar com 'if', 'while', 'do', um identificador (para atribuição) ou 'break'/'continue'.
+    return token == IF || token == WHILE || token == DO || isIdToken(token) || token == BREAK || token == CONTINUE;
+}
+
 ASTNode* B() {
     ASTNode* node = createNode(NODE_B);
 
     match(LEFT_BRACES);
 
-    if (currentToken == VAR || isIdToken(currentToken)) {
-        node->children.push_back(LDV());
-    }
-
-    while (currentToken != RIGHT_BRACES && currentToken != END_OF_FILE) { // Assumindo que END_OF_FILE é um token que você tenha definido
-        node->children.push_back(LS());
+    while (currentToken != RIGHT_BRACES && currentToken != END_OF_FILE) {
+        if (currentToken == VAR) {
+            node->children.push_back(LDV());
+        } else if (isStatementStartToken(currentToken)) {
+            node->children.push_back(LS());
+        } else {
+            syntaxError("Token inesperado em B");
+            delete node;
+            return nullptr;
+        }
     }
 
     match(RIGHT_BRACES);
@@ -294,28 +305,17 @@ ASTNode* LDV() {
 
     node->children.push_back(DV());
 
-    while (currentToken == VAR || isIdToken(currentToken)) {
+    while (currentToken == VAR) {
         node->children.push_back(DV());
     }
 
     return node;
 }
 
-// Função auxiliar hipotética
-bool isStatementStartToken(t_token token) {
-    // Esta função verifica se o token atual é o início de uma sentença/comando. 
-    // Por simplicidade, vou supor que a sentença pode começar com 'if', 'while', 'do', um identificador (para atribuição) ou 'break'/'continue'.
-    return token == IF || token == WHILE || token == DO || isIdToken(token) || token == BREAK || token == CONTINUE;
-}
-
 ASTNode* LS() {
     ASTNode* node = createNode(NODE_LS);
 
     node->children.push_back(S());
-
-    while (isStatementStartToken(currentToken)) { // Esta função precisa ser definida para verificar se um token é o início de uma sentença
-        node->children.push_back(S());
-    }
 
     return node;
 }
