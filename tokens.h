@@ -1,3 +1,6 @@
+#ifndef TOKENS_H
+#define TOKENS_H
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -10,8 +13,8 @@ using namespace std;
 
 typedef enum {
 // palavras reservadas
-ARRAY, BOOLEAN, BREAK, CHAR, CONTINUE, DO, ELSE, FALSE, FUNCTION,
-IF, INTEGER, OF, STRING, STRUCT, TRUE, TYPE, VAR, WHILE,
+ARRAY, BOOLEAN, BREAK, CHAR, CONTINUE, DO, ELSE, TOKEN_FALSE, FUNCTION,
+IF, INTEGER, OF, STRING, STRUCT, TOKEN_TRUE, TYPE, VAR, WHILE,
 // simbolos
 COLON, SEMI_COLON, COMMA, EQUALS, LEFT_SQUARE, RIGHT_SQUARE,
 LEFT_BRACES, RIGHT_BRACES, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, AND,
@@ -19,7 +22,9 @@ OR, LESS_THAN, GREATER_THAN, LESS_OR_EQUAL, GREATER_OR_EQUAL,
 NOT_EQUAL, EQUAL_EQUAL, PLUS, PLUS_PLUS, MINUS, MINUS_MINUS, TIMES,
 DIVIDE, DOT, NOT,
 // tokens regulares
-CHARACTER, NUMERAL, STRINGVAL, ID,
+CHARACTER, NUMERAL, STRINGVAL, TOKEN_ID,
+// token fim de arquivo
+END_OF_FILE,
 // token deconhecido
 UNKNOWN } t_token;
 
@@ -163,7 +168,7 @@ t_token searchKeyword(const string& name) {
         }
     }
 
-    return ID;
+    return TOKEN_ID;
 }
 
 int searchName(const string& name) {
@@ -186,8 +191,21 @@ char readChar() {
 char nextChar;
 bool lexicalError = false;
 vector<pair<char,int>> vecLexError;
+t_token lookahead;
+bool hasLookahead = false;
+std::string lastIdentifierValue;
+char lastCharacterValue;
+std::string lastStringValue;
+int lastNumeralValue;
+
 
 t_token nextToken() {
+    
+    if (hasLookahead) {
+        hasLookahead = false;
+        return lookahead;
+    }
+
     t_token token;
     int secondToken;
 
@@ -195,10 +213,10 @@ t_token nextToken() {
         nextChar = readChar();
         // cout << "Jumping Spaces --- Cont: " << contInputChar << " - nextChar = " << nextChar << endl;
     };
-    cout << "Depois de pular espacos --- Cont: " << contInputChar << " - nextChar = " << nextChar << endl;
+    cout << " Depois de pular espacos --- Cont: " << contInputChar << " - nextChar = " << nextChar << endl;
     
     if (inputFile.eof())
-        return UNKNOWN; // RETURN EOF -----------------------------------------------------------------------------------------------------------------
+        return END_OF_FILE; // RETURN EOF -----------------------------------------------------------------------------------------------------------------
 
     if (isAlphanumeric(nextChar)) {// se for alfa, pode ser tanto um identificador (ex:"a") ou o inicio de uma keyword (ex: "array")
         // leio toda a string e procuro (searchKeyword)
@@ -211,10 +229,13 @@ t_token nextToken() {
             nextChar = readChar();
         } while (isAlphanumeric(nextChar) || nextChar == '_');
 
+        // Armazenar o valor do identificador na variável global
+        lastIdentifierValue = word;
+
         // cout << "Depois do alpha: " << contInputChar << " - nextChar = " << nextChar << endl;
 
         token = searchKeyword(word);
-        if (token == ID) {
+        if (token == TOKEN_ID) {
             secondToken = searchName(word);
         }
 
@@ -225,9 +246,13 @@ t_token nextToken() {
             numStr.push_back(nextChar);
             nextChar = readChar();
         } while ((isNumeral(nextChar)));
-        
-        token = NUMERAL;
+
         int numInt = stoi(numStr);// transformando string em int
+
+        // Armazenar o valor numeral na variável global
+        lastNumeralValue = numInt;
+
+        token = NUMERAL;
         secondToken = addIntConst(numInt);
 
     } else if (nextChar == '\"') {// se começar com " , é um literal string, temos que percorrer ate encontrar outro " e atribuir token secundario e colocar no vetor vConst
@@ -240,6 +265,10 @@ t_token nextToken() {
             nextChar = readChar();
         };
         cout << "Str String literal = " << str << endl;
+
+        // Armazenar o valor da string na variável global
+        lastStringValue = str;
+
 
         if (nextChar == EOF) {
             token = UNKNOWN;
@@ -256,6 +285,9 @@ t_token nextToken() {
         nextChar = readChar();
 
         char chr = nextChar; // armazeno o char que está entre ' '
+        
+        // Armazenar o valor do caractere na variável global
+        lastCharacterValue = chr;
 
         nextChar = readChar(); // leio o segundo '
         nextChar = readChar(); // leio o próximo char
@@ -364,10 +396,49 @@ t_token nextToken() {
             }
         }
     }
+    cout << "Token: " << token;
     return token;
 }
 
-int main() {
+t_token lookaheadToken() {
+    if (!hasLookahead) {
+        lookahead = nextToken();
+        hasLookahead = true;
+    }
+    return lookahead;
+}
+
+std::string getIdentifierValue() {
+    return lastIdentifierValue;
+}
+
+char getCharacterValue() {
+    return lastCharacterValue;
+}
+
+std::string getStringValue() {
+    return lastStringValue;
+}
+
+int getNumeralValue() {
+    return lastNumeralValue;
+}
+
+void initializeLexer(const std::string& filename) {
+    // Recebe o input: código fonte
+    inputFile.open(filename);
+    if (inputFile.fail()) {
+        throw std::runtime_error("Error opening file");
+    }
+    nextChar = readChar();
+}
+
+void finalizeLexer() {
+    inputFile.close();
+}
+
+
+int old_main() {
 
     t_token t;
     // recebe o input: código fonte
@@ -397,4 +468,8 @@ int main() {
         
     } else   
         cout << endl << " ---------- Nao houve erro Lexico ---------- " << endl;
+    
+    return 0;
 }
+
+#endif
