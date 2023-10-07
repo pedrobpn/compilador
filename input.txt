@@ -1,0 +1,9 @@
+function main(arg:integer):integer
+{
+	var x:integer;
+	x = 3;
+    x = ( (x * 2) + 5 )/ 3;
+	z = "abate";
+	y = 'a';
+	k = true && false;
+}
