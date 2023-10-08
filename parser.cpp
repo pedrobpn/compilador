@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "tokens.h" // Seu código de análise léxica e enumeração de tokens deveria estar aqui
+#include "tokens.h"
 
 enum ASTNodeType {
     NODE_P, NODE_LDE, NODE_DE, NODE_T, NODE_DT, NODE_DC, NODE_DF, 
@@ -17,7 +17,7 @@ struct ASTNode {
     std::string value;
     std::vector<ASTNode*> children;
 
-    // Construtor para simplificar a criação do nodo
+    // Construtor
     ASTNode(ASTNodeType nodeType) : type(nodeType) {}
 
     // Adicionar um filho a este nodo
