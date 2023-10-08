@@ -290,13 +290,21 @@ t_token nextToken() {
         
         // Armazenar o valor do caractere na variável global
         lastCharacterValue = chr;
+        cout << "lastCharacterValue: " << chr << endl;
 
         nextChar = readChar(); // leio o segundo '
-        nextChar = readChar(); // leio o próximo char
+
+        if (nextChar != '\'') {
+            cout << "Esperado \' depois de char" << endl;
+            lexicalError = true;
+            vecLexError.push_back(make_pair(nextChar,contInputChar));
+        }
 
         token = CHARACTER;
         secondToken = addCharConst(chr);  
         nextChar = readChar();
+
+
 
     // obs: a manipulação do vetor vConst é feita pelas funções addCharConst, etc.. 
     } else {  // caso contrário, será um símbolo, e devemos abrir em casos de símbolos de 1 caractere ou 2

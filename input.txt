@@ -2,9 +2,15 @@ function main(arg: integer): integer
 {
     var x: integer;
     var y: char;
+	var l: char;
+	var p: string;
+	p = "selva";
     x = 3;
     x = x + 1;
-    y = "a";
+    y = 'a';
+	l = 'b';
+    x = x + 1;
+    y = 'a;
     if (x > 4) {
         x = x - 1;
 	}

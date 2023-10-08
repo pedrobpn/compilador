@@ -76,7 +76,7 @@ t_token currentToken;
 
 void syntaxError(const std::string& errMsg) {
     std::cerr << "Erro sintático: " << errMsg << std::endl;
-    exit(EXIT_FAILURE);
+    // exit(EXIT_FAILURE);
 }
 
 void match(t_token expected) {
@@ -863,19 +863,19 @@ std::string ASTNodeTypeToString(ASTNodeType type) {
 void printAST(ASTNode* node, int depth = 0) {
     if (!node) return;
 
-    // Para melhor visualização, indente com base na profundidade do nó.
+    // Para melhor visualização, indentando com base na profundidade do nó.
     for (int i = 0; i < depth; ++i) {
-        std::cout << "  ";  // Use dois espaços para indentação.
+        std::cout << "  ";  // Usando dois espaços para indentação.
     }
 
-    // Imprima o tipo e o valor do nó.
+    // Imprimir o tipo e o valor do nó.
     std::cout << ASTNodeTypeToString(node->type);  // Converta o tipo enum para string.
     if (!node->value.empty()) {
         std::cout << ": " << node->value;
     }
     std::cout << std::endl;
 
-    // Chame recursivamente para cada filho.
+    // Chamar recursivamente para cada filho.
     for (ASTNode* child : node->children) {
         printAST(child, depth + 1);
     }
@@ -888,8 +888,14 @@ int main() {
 
         currentToken = nextToken();  // Inicializa o currentToken com o primeiro token do arquivo
         // cout << currentToken;
-        ASTNode* rootNode = P(); // Chame a função do parser que inicia a análise, geralmente a função correspondente ao símbolo inicial da gramática.
-
+        ASTNode* rootNode = P(); // Chamando a função do parser que inicia a análise, a função correspondente ao símbolo inicial da gramática.
+        
+        if (lexicalError) {
+        std::cerr << endl << " ---------- Houve erro Lexico ---------- " << endl;
+        for (pair<char,int> x :vecLexError)
+            std::cerr << "Erro no caractere = " << x.first << " - Order = " << x.second << endl;
+            // exit(EXIT_FAILURE);
+    }
         std::cout <<"\n\nÁrvore: " << std::endl;
         printAST(rootNode);
         
