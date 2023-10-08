@@ -251,7 +251,7 @@ t_token nextToken() {
 
         // Armazenar o valor numeral na variável global
         lastNumeralValue = numInt;
-
+        cout << "Last Numeral Value: " << lastNumeralValue << endl;
         token = NUMERAL;
         secondToken = addIntConst(numInt);
 

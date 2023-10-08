@@ -780,7 +780,7 @@ ASTNode* STR() {
     ASTNode* node = createNode(NODE_STR);
 
     if (currentToken == STRINGVAL) {
-        node->value = getStringValue(); // Função hipotética que retorna o valor da string atual.
+        node->value = getStringValue(); // Função que retorna o valor da string atual.
         match(STRINGVAL);
     } else {
         syntaxError("Esperado literal de string em STR");
@@ -795,7 +795,8 @@ ASTNode* NUM() {
     ASTNode* node = createNode(NODE_NUM);
 
     if (currentToken == NUMERAL) {
-        node->value = getNumeralValue(); // Função hipotética que retorna o valor numérico atual.
+        node->value = to_string(getNumeralValue()); // Função que retorna o valor numérico atual.
+        cout << "getnumeralvalue em node->value: " << node->value << endl;
         match(NUMERAL);
     } else {
         syntaxError("Esperado literal numérico em NUM");
