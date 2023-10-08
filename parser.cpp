@@ -24,13 +24,6 @@ struct ASTNode {
     void addChild(ASTNode* child) {
         children.push_back(child);
     }
-
-    // Para simplificar a recuperação de um valor associado a um nodo
-    void setValue(const std::string& val) {
-        value = val;
-    }
-
-    // ... Outras informações úteis ou métodos, conforme necessário
 };
 
 ASTNode* createNode(ASTNodeType type) {
@@ -81,12 +74,9 @@ ASTNode* MW();
 
 t_token currentToken;
 
-// Suponha que a função nextToken() seja a função do seu analisador léxico que retorna o próximo token
-// E suponha que lookaheadToken() é uma função que verifica o próximo token sem consumi-lo
-
 void syntaxError(const std::string& errMsg) {
     std::cerr << "Erro sintático: " << errMsg << std::endl;
-    exit(EXIT_FAILURE); // Termina o programa. Alternativamente, você pode optar por continuar e encontrar mais erros
+    exit(EXIT_FAILURE);
 }
 
 void match(t_token expected) {
@@ -94,7 +84,6 @@ void match(t_token expected) {
         currentToken = nextToken();
     } else {
         syntaxError("Token inesperado!");
-        // Aqui você pode adicionar mais informações sobre o erro, como a linha e a coluna
     }
 }
 
@@ -105,7 +94,7 @@ bool isIdToken(t_token token) {
 ASTNode* P() {
     ASTNode* node = createNode(NODE_P);
     node->children.push_back(LDE());
-    if (currentToken != END_OF_FILE) { // Assumindo que você tem um token que representa o fim do arquivo
+    if (currentToken != END_OF_FILE) {
         syntaxError("Esperado fim do arquivo");
     }
     return node;
@@ -114,7 +103,7 @@ ASTNode* P() {
 ASTNode* LDE() {
     ASTNode* node = createNode(NODE_LDE);
 
-    while (currentToken == TYPE || currentToken == FUNCTION) { // Supõe que 'type' e 'function' estão na enum t_token
+    while (currentToken == TYPE || currentToken == FUNCTION) {
         node->children.push_back(DE());
     }
 
@@ -136,7 +125,7 @@ ASTNode* DE() {
 }
 
 ASTNode* T() {
-    ASTNode* node = createNode(NODE_T); // Supomos que você tenha um enum NODE_T correspondente
+    ASTNode* node = createNode(NODE_T);
 
     switch (currentToken) {
         case INTEGER:
@@ -207,7 +196,7 @@ ASTNode* DT() {
 ASTNode* DC() {
     ASTNode* node = createNode(NODE_DC);
 
-    if (currentToken == TYPE || currentToken == FUNCTION || currentToken == VAR || isIdToken(currentToken)) {  // Ajuste isIdToken conforme necessário
+    if (currentToken == TYPE || currentToken == FUNCTION || currentToken == VAR || isIdToken(currentToken)) {
         node->children.push_back(LI());
         match(COLON);
         node->children.push_back(T());
@@ -271,10 +260,8 @@ ASTNode* LP() {
     return node;
 }
 
-// Função auxiliar hipotética
 bool isStatementStartToken(t_token token) {
     // Esta função verifica se o token atual é o início de uma sentença/comando. 
-    // Por simplicidade, vou supor que a sentença pode começar com 'if', 'while', 'do', um identificador (para atribuição) ou 'break'/'continue'.
     return token == IF || token == WHILE || token == DO || isIdToken(token) || token == BREAK || token == CONTINUE;
 }
 
@@ -572,9 +559,6 @@ ASTNode* Y() {
 
 // Função auxiliar hipotética
 bool isExpressionStartToken(t_token token) {
-    // Defina essa função com base em sua gramática.
-    // Deve retornar verdadeiro se o token puder ser o início de uma expressão.
-    // Por simplicidade, vamos supor que uma expressão possa começar com um ID, numeral, char, string ou '('
     return isIdToken(token) || token == NUMERAL || token == CHARACTER || token == STRINGVAL || token == LEFT_PARENTHESIS;
 }
 
@@ -620,10 +604,10 @@ ASTNode* F() {
             break;
         default:
             if (isIdToken(currentToken)) {
-                if (lookaheadToken() == LEFT_PARENTHESIS) { // Supondo que você possa verificar o próximo token
+                if (lookaheadToken() == LEFT_PARENTHESIS) {
                     node->children.push_back(IDU());
                     match(LEFT_PARENTHESIS);
-                    if (isExpressionStartToken(currentToken)) { // Função hipotética para verificar o início de uma expressão
+                    if (isExpressionStartToken(currentToken)) { // Função para verificar o início de uma expressão
                         node->children.push_back(LE());
                     }
                     match(RIGHT_PARENTHESIS);
@@ -667,7 +651,6 @@ ASTNode* LV() {
 
     node->children.push_back(IDU());
 
-    // A loop structure to handle nested variables or array accesses
     while (currentToken == DOT || currentToken == LEFT_SQUARE) {
         if (currentToken == DOT) {
             match(DOT);
@@ -686,9 +669,8 @@ ASTNode* IDD() {
     ASTNode* node = createNode(NODE_IDD);
 
     if (currentToken == TOKEN_ID) {
-        // Aqui, você pode adicionar informações adicionais ao nó, se necessário.
-        // Por exemplo, o valor do identificador:
-        node->value = getIdentifierValue(); // Função hipotética que retorna o valor do identificador atual.
+
+        node->value = getIdentifierValue(); // Função que retorna o valor do identificador atual.
         match(TOKEN_ID);
     } else {
         syntaxError("Esperado identificador em IDD");
@@ -703,9 +685,7 @@ ASTNode* IDU() {
     ASTNode* node = createNode(NODE_IDU);
 
     if (currentToken == TOKEN_ID) {
-        // Aqui, você pode adicionar informações adicionais ao nó, se necessário.
-        // Por exemplo, o valor do identificador:
-        node->value = getIdentifierValue(); // Função hipotética que retorna o valor do identificador atual.
+        node->value = getIdentifierValue(); // Função que retorna o valor do identificador atual.
         match(TOKEN_ID);
     } else {
         syntaxError("Esperado identificador em IDU");
@@ -720,9 +700,8 @@ ASTNode* ID() {
     ASTNode* node = createNode(NODE_ID);
 
     if (currentToken == TOKEN_ID) {
-        // Aqui, você pode adicionar informações adicionais ao nó, se necessário.
-        // Por exemplo, o valor do identificador:
-        node->value = getIdentifierValue(); // Função hipotética que retorna o valor do identificador atual.
+
+        node->value = getIdentifierValue(); // Função ue retorna o valor do identificador atual.
         match(TOKEN_ID);
     } else {
         syntaxError("Esperado identificador em ID");
@@ -765,7 +744,7 @@ ASTNode* CHR() {
     ASTNode* node = createNode(NODE_CHR);
 
     if (currentToken == CHARACTER) {
-        node->value = getCharacterValue(); // Função hipotética que retorna o valor do caractere atual.
+        node->value = getCharacterValue(); // Função que retorna o valor do caractere atual.
         match(CHARACTER);
     } else {
         syntaxError("Esperado literal de caractere em CHR");
