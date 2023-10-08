@@ -213,7 +213,9 @@ t_token nextToken() {
         nextChar = readChar();
         // cout << "Jumping Spaces --- Cont: " << contInputChar << " - nextChar = " << nextChar << endl;
     };
-    cout << " Depois de pular espacos --- Cont: " << contInputChar << " - nextChar = " << nextChar << endl;
+    // cout << " Depois de pular espacos --- Cont: " << contInputChar << " - nextChar = " << nextChar << endl;
+    cout << " Cont: " << contInputChar << " - nextChar = " << nextChar << " - ";
+
     
     if (inputFile.eof())
         return END_OF_FILE; // RETURN EOF -----------------------------------------------------------------------------------------------------------------
@@ -251,7 +253,7 @@ t_token nextToken() {
 
         // Armazenar o valor numeral na variável global
         lastNumeralValue = numInt;
-        cout << "Last Numeral Value: " << lastNumeralValue << endl;
+        // cout << "Last Numeral Value: " << lastNumeralValue << endl;
         token = NUMERAL;
         secondToken = addIntConst(numInt);
 
@@ -264,7 +266,7 @@ t_token nextToken() {
             str.push_back(nextChar);
             nextChar = readChar();
         };
-        cout << "Str String literal = " << str << endl;
+        // cout << "Str String literal = " << str << endl;
 
         // Armazenar o valor da string na variável global
         lastStringValue = str;
@@ -396,7 +398,7 @@ t_token nextToken() {
             }
         }
     }
-    cout << "Token: " << token;
+    cout << "Token: " << token << endl;
     return token;
 }
 

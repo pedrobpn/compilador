@@ -796,7 +796,6 @@ ASTNode* NUM() {
 
     if (currentToken == NUMERAL) {
         node->value = to_string(getNumeralValue()); // Função que retorna o valor numérico atual.
-        cout << "getnumeralvalue em node->value: " << node->value << endl;
         match(NUMERAL);
     } else {
         syntaxError("Esperado literal numérico em NUM");
@@ -912,7 +911,7 @@ int main() {
         // cout << currentToken;
         ASTNode* rootNode = P(); // Chame a função do parser que inicia a análise, geralmente a função correspondente ao símbolo inicial da gramática.
 
-        std::cout << "Abstract Syntax Tree:" << std::endl;
+        std::cout <<"\n\nÁrvore: " << std::endl;
         printAST(rootNode);
         
         finalizeLexer();
