@@ -133,24 +133,24 @@ int main() {
     try {
         initializeLexer("input.txt");
 
-        currentToken = nextToken();  // Inicializa o currentToken com o primeiro token do arquivo
+        // Inicializa o currentToken com o primeiro token do arquivo
+        currentToken = nextToken();  
         std::cerr << endl << "Current = " << currentToken << endl;
 
+        // Cria stack e insere o 1o estado (0)
         std::stack<int> stack;
         int state = 0;
-
         stack.push(state);
 
+        // Pega a 1a ação relativa ao state atual com base no currentToken
         string action = ACTION_TABLE[stack.top()][currentToken];
         
-        int cont = 0;
-
-        // CONTROL + ; para descomentar múltiplas linhas
+        int cont = 0; // ?????????????????????? TIRAR?
 
         while (action != "acc") {
 
             if (IS_SHIFT(action)) {
-                cout << "IS_SHIFT - " << action << endl;
+                cout << endl << "SHIFT - " << action << endl;
 
                 state = action_to_int(action);
                 stack.push(state);
@@ -159,7 +159,7 @@ int main() {
                 cont += 1;
 
             } else if (IS_REDUCTION(action)) {
-            cout << "IS_REDUCTION - " << action << endl;
+            cout << endl << "REDUCTION - " << action << endl;
 
             int rule = action_to_int(action);
             
@@ -170,13 +170,16 @@ int main() {
             try {
                 cout << stack.top() << " - " << RULES_RIGHT_LEFT[rule-1][1] << endl;
 
-                for (int i=0; i<89; i++){
-                    if (ACTION_TABLE[stack.top()][i] != "")
-                        cout << "(" << i << ":" << ACTION_TABLE[stack.top()][i] << ") --- ";
-                }
+                // for (int i=0; i<89; i++){
+                //     if (ACTION_TABLE[stack.top()][i] != "")
+                //         cout << "(" << i << ":" << ACTION_TABLE[stack.top()][i] << ") --- ";
+                // }
+
+                // Atualiza state com base na regra usada para a redução 
                 state = stoi(ACTION_TABLE[stack.top()][TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]]]);
+
                 // Handle scope analysis based on the rule
-                std::cerr << rule << endl;  
+                std::cerr << "Rule: " << rule << endl; 
                 switch (rule) {
                     case DF:  // Function definition
                         enterNewScope();
