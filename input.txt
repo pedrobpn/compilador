@@ -10,7 +10,7 @@ function main(arg: integer): integer
     y = 'a';
 	l = 'b';
     x = x + 1;
-    y = 'a;
+    y = 'a';
     if (x > 4) {
         x = x - 1;
 	}

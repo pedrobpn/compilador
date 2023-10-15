@@ -4,7 +4,7 @@ Trabalho de desenvolvimento de um Compilador por partes para a disciplina de Com
 ## Uso
 
 ### Compilar
-g++ parser.cpp -o parser
+g++ parser_asc.cpp -o parser
 
 ### Executar
 ./parser

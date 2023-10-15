@@ -5,20 +5,9 @@
 #include <stack>
 #include "tokens.h"
 
-
 string ACTION_TABLE[182][89];
+string RULES_RIGHT_LEFT[87][2];
 t_token currentToken;
-
-
-
-enum ASTNodeType {
-    NODE_P, NODE_LDE, NODE_DE, NODE_T, NODE_DT, NODE_DC, NODE_DF, 
-    NODE_LP, NODE_B, NODE_LDV, NODE_LS, NODE_DV, NODE_LI, NODE_S, 
-    NODE_U, NODE_M, NODE_E, NODE_L, NODE_R, NODE_Y, NODE_F, NODE_LE, 
-    NODE_LV, NODE_IDD, NODE_IDU, NODE_ID, NODE_TRUE, NODE_FALSE, NODE_CHR, 
-    NODE_STR, NODE_NUM, NODE_NB, NODE_MF, NODE_MC, NODE_NF, NODE_MT, 
-    NODE_ME, NODE_MW
-};
 
 // enum TOKEN_ACTION_TABLE {
 // // palavras reservadas
@@ -38,24 +27,69 @@ enum ASTNodeType {
 // UNKNOWN,
 // // tokens não terminais
 // P_PRIME,P,LDE,DE,T,DT,DC,DF,LP,B,LDV,LS,DV,LI,S,U,M,E,L,R,Y,F,LE,LV,IDD,IDU,ID,TRUE,FALSE,CHR,STR,NUM,NB,MF,MC,NF,MT,ME,MW
-
 // };
 
+
 // Número de elementos do lado direito de cada regra
-int RIGHT_OF_RULE[] = {1,		2,		1,		1,		1,		1,		1,		1,		1,		1,		9,		8,		4,		5,		3,		10,		5,		3,		4,		2,		1,		2,		1,		5,		3,		1,		1,		1,		6,		9,		9,		7,		8,		2,		4,		2,		2,		3,		3,		1,		3,		3,		3,		3,		3,		3,		1,		3,		3,		1,		3,		3,		1,		1,		2,		2,		2,		2,		3,		5,		2,		2,		1,		1,		1,		1,		1,		3,		1,		3,		4,		1,		1,		1,		1,		1,			1,			1,		1,		1,		0,		0,		0,		0,		0,		0,		0};
+//int RIGHT_OF_RULE[] = {1,		2,		1,		1,		1,		1,		1,		1,		1,		1,		9,		8,		4,		5,		3,		10,		5,		3,		4,		2,		1,		2,		1,		5,		3,		1,		1,		1,		6,		9,		9,		7,		8,		2,		4,		2,		2,		3,		3,		1,		3,		3,		3,		3,		3,		3,		1,		3,		3,		1,		3,		3,		1,		1,		2,		2,		2,		2,		3,		5,		2,		2,		1,		1,		1,		1,		1,		3,		1,		3,		4,		1,		1,		1,		1,		1,			1,			1,		1,		1,		0,		0,		0,		0,		0,		0,		0};
 
 enum RULES_TYPE {
-    P,LDE,DE,DF,DT,T,DC,LI,LP,B,LDV,LS,DV,S,E,LV,L,R,Y,F,LE,ID,TRUE,FALSE,CHR,STR,NUM,P_PRIME,M,U,IDD,IDU,NB,MF,MC,NF,MT,ME,MW
+    P_PRIME=49,P,LDE,DE,T,DT,DC,DF,LP,B,LDV,LS,DV,LI,S,U,M,E,L,R,Y,F,LE,LV,IDD,IDU,ID,TRUE,FALSE,CHR,STR,NUM,NB,MF,MC,NF,MT,ME,MW
+};
+
+unordered_map<string, RULES_TYPE> TOKEN_RULES = {
+    {"P_PRIME", P_PRIME},
+    {"P", P},
+    {"LDE", LDE},
+    {"DE", DE},
+    {"T", T},
+    {"DT", DT},
+    {"DC", DC},
+    {"DF", DF},
+    {"LP", LP},
+    {"B", B},
+    {"LDV", LDV},
+    {"LS", LS},
+    {"DV", DV},
+    {"LI", LI},
+    {"S", S},
+    {"U", U},
+    {"M", M},
+    {"E", E},
+    {"L", L},
+    {"R", R},
+    {"Y", Y},
+    {"F", F},
+    {"LE", LE},
+    {"LV", LV},
+    {"IDD", IDD},
+    {"IDU", IDU},
+    {"ID", ID},
+    {"TRUE", TRUE},
+    {"FALSE", FALSE},
+    {"CHR", CHR},
+    {"STR", STR},
+    {"NUM", NUM},
+    {"NB", NB},
+    {"MF", MF},
+    {"MC", MC},
+    {"NF", NF},
+    {"MT", MT},
+    {"ME", ME},
+    {"MW", MW}
 };
 
 
 // Elementos a esquerda das regras
-RULES_TYPE LEFT_OF_RULE[] = {
-    P,     LDE,	LDE,	DE,	    DE,	    T,	    T,	    T,      T,  	T,  	DT, 	DT, 	DT, 	DC, 	DC, 	DF, 	LP, 	LP, 	B,  	LDV,	LDV,	LS, 	LS, 	DV, 	LI, 	LI, 	S,  	S,  	U,  	U,  	M,	    M,  	M,  	M,  	M,  	M,  	M,  	E,  	E,  	E,  	L,  	L,  	L,  	L,	    L,  	L,  	L,  	R,  	R,	    R,  	Y,  	Y,  	Y,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,	    LE, 	LE, 	LV,	    LV, 	LV,	    IDD,	IDU,	ID, 	TRUE,   	FALSE,  	CHR,    STR,	NUM,     NB,   	MF,	    MC,	    NF,	    MT, 	ME,	    MW};
+// RULES_TYPE LEFT_OF_RULE[] = {
+//     P,     LDE,	LDE,	DE,	    DE,	    T,	    T,	    T,      T,  	T,  	DT, 	DT, 	DT, 	DC, 	DC, 	DF, 	LP, 	LP, 	B,  	LDV,	LDV,	LS, 	LS, 	DV, 	LI, 	LI, 	S,  	S,  	U,  	U,  	M,	    M,  	M,  	M,  	M,  	M,  	M,  	E,  	E,  	E,  	L,  	L,  	L,  	L,	    L,  	L,  	L,  	R,  	R,	    R,  	Y,  	Y,  	Y,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,  	F,	    LE, 	LE, 	LV,	    LV, 	LV,	    IDD,	IDU,	ID, 	TRUE,   	FALSE,  	CHR,    STR,	NUM,     NB,   	MF,	    MC,	    NF,	    MT, 	ME,	    MW};
 
 bool syntaticalError = false;
 
-bool GET_TABLE() {
+#define IS_SHIFT(act) (act[0] == 's')
+#define IS_REDUCTION(act) (act[0] == 'r')
+
+void GET_TABLE() {
     ifstream file;
     file.open("action_table.csv", ios::in); 
   
@@ -85,39 +119,29 @@ bool GET_TABLE() {
     }
     
     file.close();
-    return true;
+};
+
+void GET_RULES() {
+    ifstream file;
+    file.open("rules_right_left.csv", ios::in); 
+  
+    if(!file.is_open()) cout << "Error opening 'RULES_RIGHT_LEFT' file\n";
+
+    for (int line=0; line<86; line++){
+        getline(file, RULES_RIGHT_LEFT[line][0], ',');
+        getline(file, RULES_RIGHT_LEFT[line][1], '\n');
+    }
+
+    // for (int line=0; line<86; line++){
+    //     cout << "(" << RULES_RIGHT_LEFT[line][0] << "," << RULES_RIGHT_LEFT[line][1] << ")" << endl;
+    // }
+
+    file.close();
 };
 
 void syntaxError(const std::string& errMsg) {
     std::cerr << "Erro sintatico: " << errMsg << std::endl;
     // exit(EXIT_FAILURE);
-}
-
-void match(t_token expected) {
-    if (currentToken == expected) {
-        currentToken = nextToken();
-    } else {
-        syntaxError("Token inesperado!");
-    }
-}
-
-bool isIdToken(t_token token) {
-    return token == TOKEN_ID;
-}
-
-
-bool isStatementStartToken(t_token token) {
-    // Esta função verifica se o token atual é o início de uma sentença/comando. 
-    return token == IF || token == WHILE || token == DO || isIdToken(token) || token == BREAK || token == CONTINUE;
-}
-
-
-bool IS_SHIFT(string cell) {
-    return (cell[0] == 's');
-}
-
-bool IS_REDUCTION(string cell) {
-    return (cell[0] == 'r');
 }
 
 int action_to_int(string action) {
@@ -129,17 +153,19 @@ int action_to_int(string action) {
 }
 
 
+
 int main() {
 
     // Lê a tabela action_table.csv e copia para ACTION_TABLE (matriz de strings)
     GET_TABLE();
+    GET_RULES();
 
 
     try {
         initializeLexer("input.txt");
 
         currentToken = nextToken();  // Inicializa o currentToken com o primeiro token do arquivo
-        // cout << currentToken;
+        // cout << endl << "Current = " << currentToken << endl;
 
         std::stack<int> stack;
         int state = 0;
@@ -154,22 +180,44 @@ int main() {
 
         while (action != "acc") {
 
-            if (action[0] == 's') {
+            if (IS_SHIFT(action)) {
+                cout << "IS_SHIFT - " << action << endl;
+
                 state = action_to_int(action);
                 stack.push(state);
                 currentToken = nextToken();
                 action = ACTION_TABLE[state][currentToken];
                 cont += 1;
-            } else if (action[0] == 'r') {
+
+            } else if (IS_REDUCTION(action)) {
+                cout << "IS_REDUCTION - " << action << endl;
+
                 int rule = action_to_int(action);
-                for (int i=0; i<RIGHT_OF_RULE[rule]; i++)
+                
+                for (int i=0; i<stoi(RULES_RIGHT_LEFT[rule-1][0]); i++)
                     stack.pop();
 
                 try {
-                    state = action_to_int(ACTION_TABLE[stack.top()][LEFT_OF_RULE[rule]]);
-                } catch(...) {
+                    // cout << "try - STATE = " << state << endl;
+                    cout << stack.top() << " - " << RULES_RIGHT_LEFT[rule-1][1] << endl;
+
+                    for (int i=0; i<89; i++){
+                        if (ACTION_TABLE[stack.top()][i] != "")
+                            cout << "(" << i << ":" << ACTION_TABLE[stack.top()][i] << ") --- ";
+                    }
+
+                    cout << endl << "TOKEN RULES =" << TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]] << endl;
+
+                    cout << endl << "action_table =" << ACTION_TABLE[stack.top()][TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]]] << "." << endl;
+
+                    state = stoi(ACTION_TABLE[stack.top()][TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]]]);
+
+                    cout << "STATE = " << state << endl;
+
+
+                } catch(string err) {
                     syntaticalError = true;
-                    cout << "Sintaxe Error in line " << endl;
+                    syntaxError(err);
                     break;
                 };
 
@@ -177,9 +225,10 @@ int main() {
                 action = ACTION_TABLE[state][currentToken];
                 cont += 1;
                 // Semantic_Analysis(self.lexical, rule)
+                
             } else{
                 syntaticalError = true;
-                cout << "Sintaxe Error in line " << endl;
+                syntaxError("Unexpected token");
                 break;
             }
 
