@@ -1,0 +1,37 @@
+P   → LDE  
+LDE → LDE DE  │ DE  
+DE  → DF  │ DT  
+T   → ‘integer’  │ ‘char’  │ ‘boolean’  │ ‘string’  │ ID U  
+DT  → ‘type’ ID D   ‘=’ ‘array’ ‘[‘ NUM ‘]’  ‘of’ T  
+    │ ‘type’ ID D   ‘=’ ‘struct’ ‘{‘ DC ‘}’  
+    │ ‘type’ ID D   ‘=’ T  
+DC  →   DC ‘;’ LI ‘:’ ‘T’  │ LI ‘:’ ‘T’  
+DF  → ‘function’ ID D   ‘(‘ LP ‘)’ ‘:’ T B  
+LP  → LP ‘,’ ID D   ‘:’ T  │ ID D   ‘:’ T  
+B   → ‘{‘ LDV LS ‘}’  
+LDV → LDV DV  │ DV  
+LS  → LS S  │ S  
+DV  → ‘var’ LI ‘:’ T ‘;’  
+LI  → LI ‘,’ ID D  │ ID D  
+S   → ‘if’ ‘(‘ E ‘)’ S  
+    │ ‘if’ ‘(‘ E ‘)’ S ‘else’ S  
+    │ ‘while’ ‘(‘ E ‘)’ S  
+    │ ‘do’ S while ‘(‘ E ‘)’ ‘;’  
+    │ B  
+    │ LV = E ‘;’  
+    │ ‘break’ ‘;’  
+    │ ‘continue’ ‘;’  
+E   → E ‘&&’ L  │ E ‘||’ L  │ L  
+L   → L ‘<’ R  │ L ‘>’ R  │ L ‘<=’ R  │ L ‘>=’ R  │ L ‘==’ R  │ L ‘!=’ R  │ R  
+R   → R ‘+’ Y  │ R ‘ - ‘ Y  │ Y  
+Y   → Y ‘*’ F  │ Y ‘/’ F  │ F  
+F   → LV  │ ‘++’ LV  │ ‘ -- ’ LV  │ LV ‘++’  │ LV ‘ -- ‘  │ ‘(‘ E ‘)’  │ ID U   ‘(‘ LE ‘)’  │ ‘ - ‘ F  │ ‘!’ F  │ TRUE  │ FALSE  │ CHR  │ STR  │ NUM  
+LE  → LE ‘,’ E  │ E  
+LV  → LV ‘.’ ID U  │ LV ‘[‘ E ‘]’  │ ID U  
+ID D → Id  
+IDU  → Id  
+TRUE →   ‘true’  
+FALSE → ‘false’  
+CHR   → c  
+STR   → s  
+NUM   → n  
