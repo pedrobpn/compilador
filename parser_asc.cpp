@@ -153,13 +153,11 @@ int action_to_int(string action) {
 }
 
 
-
 int main() {
 
     // Lê a tabela action_table.csv e copia para ACTION_TABLE (matriz de strings)
     GET_TABLE();
     GET_RULES();
-
 
     try {
         initializeLexer("input.txt");
@@ -194,6 +192,7 @@ int main() {
 
                 int rule = action_to_int(action);
                 
+                // Dando pop o número de elementos q a regra reduz
                 for (int i=0; i<stoi(RULES_RIGHT_LEFT[rule-1][0]); i++)
                     stack.pop();
 
@@ -205,15 +204,10 @@ int main() {
                         if (ACTION_TABLE[stack.top()][i] != "")
                             cout << "(" << i << ":" << ACTION_TABLE[stack.top()][i] << ") --- ";
                     }
-
-                    cout << endl << "TOKEN RULES =" << TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]] << endl;
-
-                    cout << endl << "action_table =" << ACTION_TABLE[stack.top()][TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]]] << "." << endl;
-
                     state = stoi(ACTION_TABLE[stack.top()][TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]]]);
-
-                    cout << "STATE = " << state << endl;
-
+                    // cout << endl << "TOKEN RULES =" << TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]] << endl;
+                    // cout << endl << "action_table =" << ACTION_TABLE[stack.top()][TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]]] << "." << endl;
+                    // cout << "STATE = " << state << endl;
 
                 } catch(string err) {
                     syntaticalError = true;
