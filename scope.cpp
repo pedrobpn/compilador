@@ -149,6 +149,15 @@ unordered_map<string, TAB_RULES_COL> TOKEN_RULES = {
     {"MW", MW}
 };
 
+std::string findStringWithInt(const std::unordered_map<std::string, int>& identifierTable, int value) {
+    for (const auto& pair : identifierTable) {
+        if (pair.second == value) {
+            return pair.first; // Return the first found string with the given value
+        }
+    }
+    return ""; // Return empty string if not found (or you can handle it differently)
+}
+
 bool syntaticalError = false;
 
 #define IS_SHIFT(act) (act[0] == 's')
@@ -270,7 +279,8 @@ int main() {
                     state = stoi(ACTION_TABLE[stack.top()][TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]]]);
                     
                     // Handle scope analysis based on the rule
-                    std::cerr << rule << endl;  
+                    // std::cerr << rule << endl;
+                    std::string currentName;  
                     switch (rule) {
                         case DF_RULE:  // Function definition (DF)
                             enterNewScope();
@@ -285,12 +295,16 @@ int main() {
                             }
                             break;
                         case DV_VAR_RULE: // Variable declaration (DV)
-                            checkVariableDeclaration(getIdentifierValue(), currentToken);
+                            std::cerr << "current token: " << currentToken << endl;
+                            currentName = findStringWithInt(identifierTable, secondToken);
+                            std::cerr << "current name: " << currentName << endl;
+                            checkVariableDeclaration(currentName, currentToken);
                             break;
                         case LV_DOT_RULE:
                         case LV_SQUARE_RULE:
                         case LV_IDU_RULE: // Variable usage (LV)
-                            checkVariableUsage(getIdentifierValue());
+                            currentName = findStringWithInt(identifierTable, secondToken);
+                            checkVariableUsage(currentName);
                             break;
                     }
 

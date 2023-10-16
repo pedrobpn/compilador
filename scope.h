@@ -50,6 +50,8 @@ bool variableDeclared(const std::string& name) {
 void checkVariableDeclaration(const std::string& name, t_token type) {
     if (variableDeclared(name)) {
         std::cerr << "Erro: Variável " << name << " já declarada." << std::endl;
+        // std::cerr << "Erro: Variável já declarada." << std::endl;
+
     } else {
         declareVariable(name, type);
     }
@@ -58,6 +60,7 @@ void checkVariableDeclaration(const std::string& name, t_token type) {
 void checkVariableUsage(const std::string& name) {
     if (!variableDeclared(name)) {
         std::cerr << "Erro: Variável " << name << " não foi declarada." << std::endl;
+        // std::cerr << "Erro: Variável não foi declarada." << std::endl;
     }
 }
 

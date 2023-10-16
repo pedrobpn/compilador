@@ -170,6 +170,7 @@ t_token searchKeyword(const string& name) {
 
     return TOKEN_ID;
 }
+int secondToken;
 
 int searchName(const string& name) {
     auto it = identifierTable.find(name);
@@ -207,7 +208,6 @@ t_token nextToken() {
     }
 
     t_token token;
-    int secondToken;
 
     while (isSpace(nextChar) && !(inputFile.eof())) {
         nextChar = readChar();
