@@ -4,9 +4,9 @@ Trabalho de desenvolvimento de um Compilador por partes para a disciplina de Com
 ## Uso
 
 ### Compilar
-g++ parser_asc.cpp -o parser
+g++ semantic.cpp -o semantic
 
 ### Executar
-./parser
+./semantic
 
 
