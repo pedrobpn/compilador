@@ -149,13 +149,13 @@ unordered_map<string, TAB_RULES_COL> TOKEN_RULES = {
     {"MW", MW}
 };
 
-std::string findStringWithInt(const std::unordered_map<std::string, int>& identifierTable, int value) {
+std::string findStringWithInt(const std::unordered_map<std::string, int>& identifierTable, int value) {    
     for (const auto& pair : identifierTable) {
         if (pair.second == value) {
-            return pair.first; // Return the first found string with the given value
+            return pair.first;
         }
     }
-    return ""; // Return empty string if not found (or you can handle it differently)
+    return "";
 }
 
 bool syntaticalError = false;
@@ -244,22 +244,29 @@ int main() {
         stack.push(state);
 
         string action = ACTION_TABLE[stack.top()][currentToken];
+
+        t_token oldToken;
+        int oldSecondToken;
         
         int cont = 0;
 
         while (action != "acc") {
 
             if (IS_SHIFT(action)) {
-                cout << endl << "SHIFT - " << action << endl;
+                // cout << endl << "SHIFT - " << action << endl;
 
                 state = action_to_int(action);
                 stack.push(state);
+
+                oldToken = currentToken;
+                oldSecondToken = secondToken;
                 currentToken = nextToken();
+
                 action = ACTION_TABLE[state][currentToken];
                 cont += 1;
 
             } else if (IS_REDUCTION(action)) {
-                cout << endl << "REDUCTION - " << action << endl;
+                // cout << endl << "REDUCTION - " << action << endl;
 
                 int rule = action_to_int(action);
                 
@@ -268,42 +275,31 @@ int main() {
                     stack.pop();
 
                 try {
-                    cout << stack.top() << " - " << RULES_RIGHT_LEFT[rule-1][1] << endl;
-
-                    // for (int i=0; i<89; i++){
-                    //     if (ACTION_TABLE[stack.top()][i] != "")
-                    //         cout << "(" << i << ":" << ACTION_TABLE[stack.top()][i] << ") --- ";
-                    // }
-
                     // Atualiza state com base na regra usada para a redução
                     state = stoi(ACTION_TABLE[stack.top()][TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]]]);
                     
-                    // Handle scope analysis based on the rule
-                    // std::cerr << rule << endl;
+                    // Realiza a análise de escopo com base na regra
                     std::string currentName;  
                     switch (rule) {
-                        case DF_RULE:  // Function definition (DF)
+                        case DF_RULE:  // Definição de Função (DF)
                             enterNewScope();
                             break;
-                        case B_LS_RULE:  // Start of a block (B)
+                        case B_LS_RULE:  // Começo de um bloco (B)
                             enterNewScope();
                             break;
                         case LS_LS_RULE:
-                        case LS_S_RULE: // End of a statement, potentially ending a block (LS)
-                            if (scopeStack.size() > 1) {
+                        case LS_S_RULE: // Fim de um statement, potencialmente fechando um bloco (LS)
+                            if (scopeStack.size() > 1)
                                 leaveScope();
-                            }
                             break;
-                        case DV_VAR_RULE: // Variable declaration (DV)
-                            std::cerr << "current token: " << currentToken << endl;
-                            currentName = findStringWithInt(identifierTable, secondToken);
-                            std::cerr << "current name: " << currentName << endl;
-                            checkVariableDeclaration(currentName, currentToken);
+                        case DV_VAR_RULE: // Declaração de variável (DV)
+                            currentName = findStringWithInt(identifierTable, oldSecondToken);
+                            checkVariableDeclaration(currentName, oldToken);
                             break;
                         case LV_DOT_RULE:
                         case LV_SQUARE_RULE:
-                        case LV_IDU_RULE: // Variable usage (LV)
-                            currentName = findStringWithInt(identifierTable, secondToken);
+                        case LV_IDU_RULE: // Uso de variável (LV)
+                            currentName = findStringWithInt(identifierTable, oldSecondToken);
                             checkVariableUsage(currentName);
                             break;
                     }
@@ -317,7 +313,6 @@ int main() {
                 stack.push(state);
                 action = ACTION_TABLE[state][currentToken];
                 cont += 1;
-                // Semantic_Analysis(self.lexical, rule)
             } else{
                     syntaticalError = true;
                     syntaxError("Unexpected token");

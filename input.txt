@@ -1,4 +1,18 @@
-function main(arg: integer): integer {
+function main(arg: integer): integer
+{
     var x: integer;
+    var y: char;
+	var l: char;
+	var p: string;
+
+    var x: integer;
+
+	p = "selva";
     x = 3;
+    y = 'a';
+	l = 'b';
+    x = x + 1;
+    x = ( (x * 2) + 5 )/ 3;
+    y = 'a';
+	z = 6;
 }

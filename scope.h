@@ -25,7 +25,7 @@ std::stack<Scope*> scopeStack;
 void declareVariable(const std::string& name, t_token type) {
     Scope* currentScope = scopeStack.top();
     if (currentScope->symbols.find(name) != currentScope->symbols.end()) {
-        std::cerr << "Erro: Variável " << name << " já declarada no escopo atual." << std::endl;
+        std::cerr << endl << "--------------------------" << endl << "Erro: Variavel " << name << " ja declarada no escopo atual." << endl << "--------------------------" << std::endl;
     } else {
         Symbol newSymbol;
         newSymbol.name = name;
@@ -47,7 +47,7 @@ bool variableDeclared(const std::string& name) {
 
 void checkVariableDeclaration(const std::string& name, t_token type) {
     if (variableDeclared(name)) {
-        std::cerr << "Erro: Variável " << name << " já declarada." << std::endl;
+        std::cerr << endl << "--------------------------" << endl << "Erro: Variavel " << name << " ja declarada." << endl << "--------------------------" << std::endl;
         // std::cerr << "Erro: Variável já declarada." << std::endl;
 
     } else {
@@ -57,7 +57,7 @@ void checkVariableDeclaration(const std::string& name, t_token type) {
 
 void checkVariableUsage(const std::string& name) {
     if (!variableDeclared(name)) {
-        std::cerr << "Erro: Variável " << name << " não foi declarada." << std::endl;
+        std::cerr << endl << "--------------------------" << endl << "Erro: Variavel " << name << " nao foi declarada." << endl << "--------------------------" << std::endl;
         // std::cerr << "Erro: Variável não foi declarada." << std::endl;
     }
 }

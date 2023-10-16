@@ -241,30 +241,5 @@ int main() {
         return 1;
     }
 
-
     return 0;
 };
-
-
-int oldd_main() {
-    try {
-        initializeLexer("input.txt");
-
-        currentToken = nextToken();  // Inicializa o currentToken com o primeiro token do arquivo
-        // cout << currentToken;
-        
-        if (lexicalError) {
-            std::cerr << endl << " ---------- Houve erro Lexico ---------- " << endl;
-            for (pair<char,int> x :vecLexError)
-                std::cerr << "Erro no caractere = " << x.first << " - Order = " << x.second << endl;
-                // exit(EXIT_FAILURE);
-        }
-        
-        finalizeLexer();
-        
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-        return 1;
-    }
-    return 0;
-}
