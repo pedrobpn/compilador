@@ -3,6 +3,8 @@
 #include <fstream>
 #include <string>
 #include <stack>
+#include <unordered_map>
+#include <vector>
 #include "scope.h"
 #include "tokens.h"
 
@@ -10,11 +12,102 @@ string ACTION_TABLE[182][89];
 string RULES_RIGHT_LEFT[87][2];
 t_token currentToken;
 
-enum RULES_TYPE {
+enum TAB_RULES_COL {
     P_PRIME=49,P,LDE,DE,T,DT,DC,DF,LP,B,LDV,LS,DV,LI,S,U,M,E,L,R,Y,F,LE,LV,IDD,IDU,ID,TRUE,FALSE,CHR,STR,NUM,NB,MF,MC,NF,MT,ME,MW
 };
 
-unordered_map<string, RULES_TYPE> TOKEN_RULES = {
+enum RULES_NUMBER {
+    PLINE_P_RULE = 0,
+    P_LDE_RULE = 1,
+    LDE_LDE_RULE = 2,
+    LDE_DE_RULE = 3,
+    DE_DF_RULE = 4,
+    DE_DT_RULE = 5,
+    T_INTEGER_RULE = 6,
+    T_CHAR_RULE  = 7,
+    T_BOOL_RULE = 8,
+    T_STRING_RULE = 9,
+    T_IDU_RULE = 10,
+    DT_ARRAY_RULE = 11,
+    DT_STRUCT_RULE = 12,
+    DT_ALIAS_RULE = 12,
+    DC_DC_RULE = 14,
+    DC_LI_RULE = 15,
+    DF_RULE = 16,
+    LP_LP_RULE = 17,
+    LP_IDD_RULE = 18,
+    B_LS_RULE = 19,
+    LDV_LDV_RULE = 20,
+    LDV_DV_RULE = 21,
+    LS_LS_RULE = 22,
+    LS_S_RULE = 23,
+    DV_VAR_RULE = 24,
+    LI_COMMA_RULE = 25,
+    LI_IDD_RULE = 26,
+    S_M_RULE = 27,
+    S_U_RULE = 28,
+    U_IF_RULE = 29,
+    U_IF_ELSE_U_RULE = 30,
+    M_IF_ELSE_M_RULE = 31,
+    M_WHILE_RULE = 32,
+    M_DO_WHILE_RULE = 33,
+    M_BLOCK_RULE = 34,
+    M_E_SEMICOLON = 35,
+    M_BREAK_RULE = 36,
+    M_CONTINUE_RULE = 37,
+    E_AND_RULE = 38,
+    E_OR_RULE = 39,
+    E_L_RULE = 40,
+    L_LESS_THAN_RULE = 41,
+    L_GREATER_THAN_RULE = 42,
+    L_LESS_EQUAL_RULE = 43,
+    L_GREATER_EQUAL_RULE = 44,
+    L_EQUAL_EQUAL_RULE = 45,
+    L_NOT_EQUAL_RULE = 46,
+    L_R_RULE = 47,
+    R_PLUS_RULE = 48,
+    R_MINUS_RULE = 49,
+    R_Y_RULE = 50,
+    Y_TIMES_RULE = 51,
+    Y_DIVIDE_RULE = 52,
+    Y_F_RULE = 53,
+    F_LV_RULE = 54,
+    F_LEFT_PLUS_PLUS_RULE = 55,
+    F_LEFT_MINUS_MINUS_RULE = 56,
+    F_RIGHT_PLUS_PLUS_RULE = 57,
+    F_RIGHT_MINUS_MINUS_RULE = 58,
+    F_PARENTHESIS_E_RULE = 59,
+    F_IDU_MC_RULE = 60,
+    F_MINUS_F_RULE = 61,
+    F_NOT_F_RULE = 62,
+    F_TRUE_RULE = 63,
+    F_FALSE_RULE = 64,
+    F_CHR_RULE = 65,
+    F_STR_RULE = 66,
+    F_NUM_RULE = 67,
+    LE_LE_RULE = 68,
+    LE_E_RULE = 69,
+    LV_DOT_RULE = 70,
+    LV_SQUARE_RULE = 71,
+    LV_IDU_RULE = 72,
+    IDD_RULE = 73,
+    IDU_RULE = 74,
+    ID_RULE = 75,
+    TRUE_RULE = 76,
+    FALSE_RULE = 77,
+    CHR_RULE = 78,
+    STR_RULE = 79,
+    NUM_RULE = 80,
+    NB_RULE = 81,
+    MF_RULE = 82,
+    MC_RULE = 83,
+    NF_RULE = 84,
+    MT_RULE = 85,
+    ME_RULE = 86,
+    MW_RULE = 87
+};
+
+unordered_map<string, TAB_RULES_COL> TOKEN_RULES = {
     {"P_PRIME", P_PRIME},
     {"P", P},
     {"LDE", LDE},
@@ -133,8 +226,7 @@ int main() {
     try {
         initializeLexer("input.txt");
 
-        // Inicializa o currentToken com o primeiro token do arquivo
-        currentToken = nextToken();  
+        currentToken = nextToken();  // Inicializa o currentToken com o primeiro token do arquivo
         std::cerr << endl << "Current = " << currentToken << endl;
 
         // Cria stack e insere o 1o estado (0)
@@ -142,10 +234,9 @@ int main() {
         int state = 0;
         stack.push(state);
 
-        // Pega a 1a ação relativa ao state atual com base no currentToken
         string action = ACTION_TABLE[stack.top()][currentToken];
         
-        int cont = 0; // ?????????????????????? TIRAR?
+        int cont = 0;
 
         while (action != "acc") {
 
@@ -175,31 +266,32 @@ int main() {
                 //         cout << "(" << i << ":" << ACTION_TABLE[stack.top()][i] << ") --- ";
                 // }
 
-                // Atualiza state com base na regra usada para a redução 
+                // Atualiza state com base na regra usada para a redução
                 state = stoi(ACTION_TABLE[stack.top()][TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]]]);
-
+                
                 // Handle scope analysis based on the rule
-                std::cerr << "Rule: " << rule << endl; 
+                std::cerr << rule << endl;  
                 switch (rule) {
-                    case DF:  // Function definition
+                    case DF_RULE:  // Function definition (DF)
                         enterNewScope();
                         break;
-                    case B:  // Start of a block
+                    case B_LS_RULE:  // Start of a block (B)
                         enterNewScope();
                         break;
-                    case LS: // End of a statement, potentially ending a block
+                    case LS_LS_RULE:
+                    case LS_S_RULE: // End of a statement, potentially ending a block (LS)
                         if (scopeStack.size() > 1) {
                             leaveScope();
                         }
                         break;
-                    case DV: // Variable declaration
-                        std::cerr << "aqui";
+                    case DV_VAR_RULE: // Variable declaration (DV)
                         checkVariableDeclaration(getIdentifierValue(), currentToken);
                         break;
-                    case LV: // Variable usage
+                    case LV_DOT_RULE:
+                    case LV_SQUARE_RULE:
+                    case LV_IDU_RULE: // Variable usage (LV)
                         checkVariableUsage(getIdentifierValue());
                         break;
-                    // Potentially add more rules if necessary.
                 }
 
             } catch(string err) {
