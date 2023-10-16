@@ -177,8 +177,8 @@ int searchName(const string& name) {
     if (it != identifierTable.end()) {
         return it->second;
     } else {
-        identifierTable[name] = secondToken++;
-        return secondToken - 1;
+        identifierTable[name] = secondaryToken++;
+        return secondaryToken - 1;
     }
 }
 
