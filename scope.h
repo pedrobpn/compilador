@@ -13,12 +13,10 @@ struct Symbol {
 
 struct Scope {
     std::map<std::string, Symbol> symbols;
-    Scope* parentScope; // escopo pai (para escopos aninhados)
+    Scope* parentScope;
 
-    // Construtor padrão
     Scope() : parentScope(nullptr) {}
 
-    // Construtor que aceita um escopo pai
     Scope(Scope* parent) : parentScope(parent) {}
 };
 
@@ -73,7 +71,7 @@ void enterNewScope() {
 void leaveScope() {
     Scope* topScope = scopeStack.top();
     scopeStack.pop();
-    delete topScope; // Libere a memória do escopo que está saindo
+    delete topScope;
 }
 
 #endif
