@@ -227,7 +227,7 @@ int main() {
         initializeLexer("input.txt");
 
         currentToken = nextToken();  // Inicializa o currentToken com o primeiro token do arquivo
-        std::cerr << endl << "Current = " << currentToken << endl;
+        // std::cerr << endl << "Current = " << currentToken << endl;
 
         // Cria stack e insere o 1o estado (0)
         std::stack<int> stack;
@@ -250,66 +250,64 @@ int main() {
                 cont += 1;
 
             } else if (IS_REDUCTION(action)) {
-            cout << endl << "REDUCTION - " << action << endl;
+                cout << endl << "REDUCTION - " << action << endl;
 
-            int rule = action_to_int(action);
-            
-            // Dando pop o número de elementos q a regra reduz
-            for (int i=0; i<stoi(RULES_RIGHT_LEFT[rule-1][0]); i++)
-                stack.pop();
-
-            try {
-                cout << stack.top() << " - " << RULES_RIGHT_LEFT[rule-1][1] << endl;
-
-                // for (int i=0; i<89; i++){
-                //     if (ACTION_TABLE[stack.top()][i] != "")
-                //         cout << "(" << i << ":" << ACTION_TABLE[stack.top()][i] << ") --- ";
-                // }
-
-                // Atualiza state com base na regra usada para a redução
-                state = stoi(ACTION_TABLE[stack.top()][TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]]]);
+                int rule = action_to_int(action);
                 
-                // Handle scope analysis based on the rule
-                std::cerr << rule << endl;  
-                switch (rule) {
-                    case DF_RULE:  // Function definition (DF)
-                        enterNewScope();
-                        break;
-                    case B_LS_RULE:  // Start of a block (B)
-                        enterNewScope();
-                        break;
-                    case LS_LS_RULE:
-                    case LS_S_RULE: // End of a statement, potentially ending a block (LS)
-                        if (scopeStack.size() > 1) {
-                            leaveScope();
-                        }
-                        break;
-                    case DV_VAR_RULE: // Variable declaration (DV)
-                        checkVariableDeclaration(getIdentifierValue(), currentToken);
-                        break;
-                    case LV_DOT_RULE:
-                    case LV_SQUARE_RULE:
-                    case LV_IDU_RULE: // Variable usage (LV)
-                        checkVariableUsage(getIdentifierValue());
-                        break;
-                }
+                // Dando pop o número de elementos q a regra reduz
+                for (int i=0; i<stoi(RULES_RIGHT_LEFT[rule-1][0]); i++)
+                    stack.pop();
 
-            } catch(string err) {
-                syntaticalError = true;
-                syntaxError(err);
-                break;
-            };
+                try {
+                    cout << stack.top() << " - " << RULES_RIGHT_LEFT[rule-1][1] << endl;
 
-            stack.push(state);
-            action = ACTION_TABLE[state][currentToken];
-            cont += 1;
-            // Semantic_Analysis(self.lexical, rule)
-        }
-        
-        else{
-                syntaticalError = true;
-                syntaxError("Unexpected token");
-                break;
+                    // for (int i=0; i<89; i++){
+                    //     if (ACTION_TABLE[stack.top()][i] != "")
+                    //         cout << "(" << i << ":" << ACTION_TABLE[stack.top()][i] << ") --- ";
+                    // }
+
+                    // Atualiza state com base na regra usada para a redução
+                    state = stoi(ACTION_TABLE[stack.top()][TOKEN_RULES[RULES_RIGHT_LEFT[rule-1][1]]]);
+                    
+                    // Handle scope analysis based on the rule
+                    std::cerr << rule << endl;  
+                    switch (rule) {
+                        case DF_RULE:  // Function definition (DF)
+                            enterNewScope();
+                            break;
+                        case B_LS_RULE:  // Start of a block (B)
+                            enterNewScope();
+                            break;
+                        case LS_LS_RULE:
+                        case LS_S_RULE: // End of a statement, potentially ending a block (LS)
+                            if (scopeStack.size() > 1) {
+                                leaveScope();
+                            }
+                            break;
+                        case DV_VAR_RULE: // Variable declaration (DV)
+                            checkVariableDeclaration(getIdentifierValue(), currentToken);
+                            break;
+                        case LV_DOT_RULE:
+                        case LV_SQUARE_RULE:
+                        case LV_IDU_RULE: // Variable usage (LV)
+                            checkVariableUsage(getIdentifierValue());
+                            break;
+                    }
+
+                } catch(string err) {
+                    syntaticalError = true;
+                    syntaxError(err);
+                    break;
+                };
+
+                stack.push(state);
+                action = ACTION_TABLE[state][currentToken];
+                cont += 1;
+                // Semantic_Analysis(self.lexical, rule)
+            } else{
+                    syntaticalError = true;
+                    syntaxError("Unexpected token");
+                    break;
             }
 
             if (lexicalError) {
