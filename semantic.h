@@ -1,5 +1,5 @@
-#ifndef SCOPE_H
-#define SCOPE_H
+#ifndef SEMANTIC_H
+#define SEMANTIC_H
 #include <iostream>
 #include <string>
 #include <map>

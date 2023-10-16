@@ -5,7 +5,7 @@
 #include <stack>
 #include <unordered_map>
 #include <vector>
-#include "scope.h"
+#include "semantic.h"
 #include "tokens.h"
 
 string ACTION_TABLE[182][89];
