@@ -177,8 +177,8 @@ int searchName(const string& name) {
     if (it != identifierTable.end()) {
         return it->second;
     } else {
-        identifierTable[name] = secondaryToken++;
-        return secondaryToken - 1;
+        identifierTable[name] = secondToken++;
+        return secondToken - 1;
     }
 }
 
@@ -192,8 +192,7 @@ char readChar() {
 char nextChar;
 bool lexicalError = false;
 vector<pair<char,int>> vecLexError;
-t_token lookahead;
-bool hasLookahead = false;
+
 std::string lastIdentifierValue;
 char lastCharacterValue;
 std::string lastStringValue;
@@ -201,40 +200,29 @@ int lastNumeralValue;
 
 
 t_token nextToken() {
-    
-    if (hasLookahead) {
-        hasLookahead = false;
-        return lookahead;
-    }
-
     t_token token;
 
     while (isSpace(nextChar) && !(inputFile.eof())) {
         nextChar = readChar();
-        // cout << "Jumping Spaces --- Cont: " << contInputChar << " - nextChar = " << nextChar << endl;
     };
-    // cout << " Depois de pular espacos --- Cont: " << contInputChar << " - nextChar = " << nextChar << endl;
     cout << " Cont: " << contInputChar << " - nextChar = " << nextChar << " - ";
 
     
     if (inputFile.eof())
-        return END_OF_FILE; // RETURN EOF -----------------------------------------------------------------------------------------------------------------
+        return END_OF_FILE; // RETURN EOF
 
-    if (isAlphanumeric(nextChar)) {// se for alfa, pode ser tanto um identificador (ex:"a") ou o inicio de uma keyword (ex: "array")
+    if (isAlphanumeric(nextChar)) {// se for alfanumérico, pode ser tanto um identificador (ex:"a") ou o inicio de uma keyword (ex: "array")
         // leio toda a string e procuro (searchKeyword)
         // se for identificador, atribuo token secundário
         string word;
 
         do {
-            // cout << "loop alphanum: " << contInputChar << "- nextChar = " << nextChar << endl;
             word.push_back(nextChar);
             nextChar = readChar();
         } while (isAlphanumeric(nextChar) || nextChar == '_');
 
         // Armazenar o valor do identificador na variável global
         lastIdentifierValue = word;
-
-        // cout << "Depois do alpha: " << contInputChar << " - nextChar = " << nextChar << endl;
 
         token = searchKeyword(word);
         if (token == TOKEN_ID) {
@@ -253,7 +241,6 @@ t_token nextToken() {
 
         // Armazenar o valor numeral na variável global
         lastNumeralValue = numInt;
-        // cout << "Last Numeral Value: " << lastNumeralValue << endl;
         token = NUMERAL;
         secondToken = addIntConst(numInt);
 
@@ -266,7 +253,6 @@ t_token nextToken() {
             str.push_back(nextChar);
             nextChar = readChar();
         };
-        // cout << "Str String literal = " << str << endl;
 
         // Armazenar o valor da string na variável global
         lastStringValue = str;
@@ -306,7 +292,6 @@ t_token nextToken() {
 
 
 
-    // obs: a manipulação do vetor vConst é feita pelas funções addCharConst, etc.. 
     } else {  // caso contrário, será um símbolo, e devemos abrir em casos de símbolos de 1 caractere ou 2
         // CASOS        
         if (isOtherUsedChar(nextChar)) {
@@ -410,14 +395,6 @@ t_token nextToken() {
     return token;
 }
 
-t_token lookaheadToken() {
-    if (!hasLookahead) {
-        lookahead = nextToken();
-        hasLookahead = true;
-    }
-    return lookahead;
-}
-
 std::string getIdentifierValue() {
     return lastIdentifierValue;
 }
@@ -445,41 +422,6 @@ void initializeLexer(const std::string& filename) {
 
 void finalizeLexer() {
     inputFile.close();
-}
-
-
-int old_main() {
-
-    t_token t;
-    // recebe o input: código fonte
-    inputFile.open("input.txt");
-
-    if (inputFile.fail()) {
-        cout << "Error opening file";
-        return 1;
-    }
-
-    nextChar = readChar();
-    // faz um loop percorrendo cada caractere
-    while (!(inputFile.eof())) {
-        cout << "Cont: " << contInputChar << " - nextChar = " << nextChar << endl;
-        //começo pulando os espaços ate o prox caractere
-        // nextChar = readChar();
-        if (nextChar != EOF) {
-            t = nextToken();
-            cout << "Token = " << t << endl << endl;
-        }
-    };
-    
-    if (lexicalError) {
-        cout << endl << " ---------- Houve erro Lexico ---------- " << endl;
-        for (pair<char,int> x :vecLexError)
-            cout << "Char error = " << x.first << " - Reading order = " << x.second << endl;
-        
-    } else   
-        cout << endl << " ---------- Nao houve erro Lexico ---------- " << endl;
-    
-    return 0;
 }
 
 #endif
